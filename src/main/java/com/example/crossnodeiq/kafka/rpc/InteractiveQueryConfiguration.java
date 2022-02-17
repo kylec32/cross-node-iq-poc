@@ -12,16 +12,8 @@ import java.net.UnknownHostException;
 @Configuration
 @Slf4j
 public class InteractiveQueryConfiguration {
-    private final int portNumber;
-
-    public InteractiveQueryConfiguration(
-            @Value("${server.port}") int port
-    ) {
-        this.portNumber = port;
-    }
-
     @Bean
-    public HostInfo currentServiceHostInfo() throws UnknownHostException {
+    public HostInfo currentServiceHostInfo(@Value("${server.port}") int portNumber) throws UnknownHostException {
         String hostname = InetAddress.getLocalHost().getHostName();
         log.info("Current host seems to be: " + hostname + ":" + portNumber);
         return new HostInfo(hostname, portNumber);

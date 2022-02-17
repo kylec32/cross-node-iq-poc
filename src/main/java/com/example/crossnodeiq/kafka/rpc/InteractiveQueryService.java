@@ -34,13 +34,13 @@ public class InteractiveQueryService {
     private final ObjectMapper jsonMapper = new ObjectMapper();
     private final AvroSerializer<SpecificRecordBase> avroSerializer = new AvroSerializer<>(true);
 
-        public <T, U> Optional<T> query(@NonNull final StoreInfo<U, T> storeInfo,
-                                        @NonNull final U key,
-                                        @NonNull final Function<U, Optional<T>> localProducer) {
+    public <T, U> Optional<T> query(@NonNull final StoreInfo<U, T> storeInfo,
+                                    @NonNull final U key,
+                                    @NonNull final Function<U, Optional<T>> localProducer) {
 
-            KeyQueryMetadata metadata = storeInfo.getStreams().queryMetadataForKey(storeInfo.getStoreName(),
-                                                                                   key,
-                                                                                   storeInfo.getKeySerializer());
+        KeyQueryMetadata metadata = storeInfo.getStreams().queryMetadataForKey(storeInfo.getStoreName(),
+                                                                               key,
+                                                                               storeInfo.getKeySerializer());
 
         if (metadata.activeHost().equals(hostInfo)) {
             log.info("Local request. " + metadata.activeHost());

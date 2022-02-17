@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.net.UnknownHostException;
 import java.util.Properties;
 
 @Configuration
@@ -38,7 +37,7 @@ public class StreamsConfiguration {
     }
 
     @Bean
-    public Properties baseStreamConfig(HostInfo hostInfo, @Qualifier("kafkaBaseProperties") Properties baseProperties) throws UnknownHostException {
+    public Properties baseStreamConfig(HostInfo hostInfo, @Qualifier("kafkaBaseProperties") Properties baseProperties) {
         final Properties properties = new Properties();
         properties.putAll(baseProperties);
         properties.put(StreamsConfig.TOPOLOGY_OPTIMIZATION_CONFIG, StreamsConfig.OPTIMIZE);
@@ -50,8 +49,11 @@ public class StreamsConfiguration {
         properties.put("value.deserializer", SchemaRegistrylessAvroDeserializer.class);
         properties.put(StreamsConfig.APPLICATION_ID_CONFIG, "example-app");
         properties.put("replication.factor", 1);
-        properties.put(StreamsConfig.STATE_DIR_CONFIG,
-                       TestUtils.tempDirectory().getAbsolutePath());
+
+        // Only required when running two instances of the same application on the same machine
+        properties.put(StreamsConfig.STATE_DIR_CONFIG, TestUtils.tempDirectory().getAbsolutePath());
+
+        // Provides information about how the current instance is configured to allow lookup later.
         properties.put(StreamsConfig.APPLICATION_SERVER_CONFIG, hostInfo.host() + ":" + hostInfo.port());
 
         return properties;
@@ -66,6 +68,8 @@ public class StreamsConfiguration {
         KafkaStreams streams = new KafkaStreams(topology, baseStreamConfig);
         streams.cleanUp();
         streams.start();
+
+        System.out.println(topology.describe());
 
         return streams;
     }
